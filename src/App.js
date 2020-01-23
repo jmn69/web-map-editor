@@ -10,6 +10,7 @@ import {
   EditorContainer,
   MapInnerContainer,
 } from './App.s';
+import Editor from './Editor';
 
 const VERTICAL_SPACE = 50;
 const HORIZONTAL_SPACE = 30;
@@ -23,7 +24,7 @@ export default () => {
 
   let lastHorizontalSpace = 0;
   for (let row = 0; row < 17; row++) {
-    let lastVerticalSpace = 40;
+    let lastVerticalSpace = 20;
     for (let column = 0; column < 21; column++) {
       hexes.push(
         <HexagoneWrapper
@@ -54,9 +55,7 @@ export default () => {
     <Container>
       <AppContainer>
         <EditorContainer>
-          {selectedCell
-            ? selectedCell
-            : "Sélectionnez une cellule pour l'éditer"}
+          <Editor selectedCell={selectedCell} />
         </EditorContainer>
         <MapContainer>
           <MapInnerContainer>{hexes}</MapInnerContainer>

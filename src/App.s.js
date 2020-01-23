@@ -22,20 +22,24 @@ export const AppContainer = styled.div`
 export const MapContainer = styled.div`
   position: relative;
   flex: 2;
-  min-height: 1200px;
   background: ${props => props.theme.colors.lightGrey};
   display: flex;
   justify-content: center;
+  align-items: center;
+  min-height: 1090px;
 `;
 
 export const MapInnerContainer = styled.div`
   position: relative;
   width: 1052px;
+  height: 1090px;
 `;
 
 export const EditorContainer = styled.div`
   flex: 1;
   background: ${props => props.theme.colors.primary};
+  min-height: 1090px;
+  min-width: 350px;
 `;
 
 export const HexagoneWrapper = styled.div`
