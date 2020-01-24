@@ -59,6 +59,7 @@ export const ContentContainer = styled.div`
 export const EmptyCellText = styled.span`
   font-size: 20px;
   color: ${props => props.theme.colors.black};
+  text-align: center;
 `;
 
 export const Gutter = styled.div`

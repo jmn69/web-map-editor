@@ -1,4 +1,12 @@
 import React, { useState } from 'react';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import {
+  faCircleNotch,
+  faWater,
+  faEraser,
+  faSeedling,
+  faUmbrellaBeach,
+} from '@fortawesome/free-solid-svg-icons';
 
 import {
   Container,
@@ -9,8 +17,12 @@ import {
   ContentWrapper,
   EditorContainer,
   MapInnerContainer,
+  ToolbarWrapper,
 } from './App.s';
 import Editor from './Editor';
+import Toolbar from './Toolbar';
+
+library.add(faCircleNotch, faWater, faEraser, faSeedling, faUmbrellaBeach);
 
 const VERTICAL_SPACE = 50;
 const HORIZONTAL_SPACE = 40;
@@ -70,7 +82,12 @@ export default () => {
           />
         </EditorContainer>
         <MapContainer>
-          <MapInnerContainer>{hexes}</MapInnerContainer>
+          <MapInnerContainer>
+            <ToolbarWrapper>
+              <Toolbar />
+            </ToolbarWrapper>
+            {hexes}
+          </MapInnerContainer>
         </MapContainer>
       </AppContainer>
     </Container>

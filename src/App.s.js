@@ -87,21 +87,21 @@ export const Hexagone = styled.div`
   background-color: ${props => selectBackgroundByFieldType(props.fieldType)};
 
   &:hover {
-    border-left: solid 1px ${props => props.theme.colors.primary};
-    border-right: solid 1px ${props => props.theme.colors.primary};
+    border-left: solid 1px ${props => props.theme.colors.accent};
+    border-right: solid 1px ${props => props.theme.colors.accent};
     z-index: 9999;
-    background-color: rgb(33, 150, 243);
-    opacity: 0.3;
+    background-color: rgb(255, 86, 19);
+    opacity: 0.4;
   }
 
   &:hover:before {
-    border-top: solid 1.4142px ${props => props.theme.colors.primary};
-    border-right: solid 1.4142px ${props => props.theme.colors.primary};
+    border-top: solid 1.4142px ${props => props.theme.colors.accent};
+    border-right: solid 1.4142px ${props => props.theme.colors.accent};
   }
 
   &:hover:after {
-    border-bottom: solid 1.4142px ${props => props.theme.colors.primary};
-    border-left: solid 1.4142px ${props => props.theme.colors.primary};
+    border-bottom: solid 1.4142px ${props => props.theme.colors.accent};
+    border-left: solid 1.4142px ${props => props.theme.colors.accent};
   }
 
   &:before {
@@ -129,4 +129,13 @@ export const ContentWrapper = styled.div`
   text-align: center;
   width: 60px;
   cursor: pointer;
+`;
+
+export const ToolbarWrapper = styled.div`
+  position: absolute;
+  top: 10px;
+  left: 0;
+  z-index: 20000;
+  height: 80px;
+  width: 100%;
 `;
