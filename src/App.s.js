@@ -61,6 +61,19 @@ const hexaMixin = css`
   left: 7.7868px;
 `;
 
+const selectBackgroundByFieldType = fieldType => {
+  switch (fieldType) {
+    case '0':
+      return '#00D41B';
+    case '1':
+      return '#FFF6A0';
+    case '2':
+      return '#1C9EFF';
+    default:
+      return 'white';
+  }
+};
+
 export const Hexagone = styled.div`
   position: relative;
   width: 60px;
@@ -71,8 +84,7 @@ export const Hexagone = styled.div`
   cursor: pointer;
   z-index: 1;
 
-  background-color: ${props => (props.isHover ? 'rgb(33, 150, 243)' : 'white')};
-  opacity: ${props => (props.isHover ? '0.3' : '1')};
+  background-color: ${props => selectBackgroundByFieldType(props.fieldType)};
 
   &:hover {
     border-left: solid 1px ${props => props.theme.colors.primary};

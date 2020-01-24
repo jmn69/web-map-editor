@@ -15,9 +15,10 @@ import Editor from './Editor';
 const VERTICAL_SPACE = 50;
 const HORIZONTAL_SPACE = 30;
 const WIDTH = 60;
+const initialMap = { cells: [] };
 
 export default () => {
-  const [isHoverCell, setIsHoverCell] = useState(null);
+  const [map, setMap] = useState(initialMap);
   const [selectedCell, setSelectedCell] = useState(null);
 
   const hexes = [];
@@ -26,21 +27,22 @@ export default () => {
   for (let row = 0; row < 17; row++) {
     let lastVerticalSpace = 20;
     for (let column = 0; column < 21; column++) {
+      const foundCellInMap = map.cells.find(
+        cell => cell.column === column && cell.row === row
+      );
       hexes.push(
         <HexagoneWrapper
-          onClick={() => setSelectedCell(`${column}-${row}`)}
+          onClick={() => setSelectedCell({ column, row })}
           key={`${column}-${row}`}
           bottom={lastVerticalSpace}
           left={lastHorizontalSpace + (column % 2 === 0 ? 0 : HORIZONTAL_SPACE)}
         >
-          <Hexagone isHover={isHoverCell === `${column}-${row}`} />
+          <Hexagone fieldType={foundCellInMap && foundCellInMap.fieldType} />
         </HexagoneWrapper>
       );
       hexes.push(
         <ContentWrapper
-          onClick={() => setSelectedCell(`${column}-${row}`)}
-          onMouseEnter={() => setIsHoverCell(`${column}-${row}`)}
-          onMouseLeave={() => setIsHoverCell(null)}
+          onClick={() => setSelectedCell({ column, row })}
           key={`${column}-${row}-content`}
           bottom={lastVerticalSpace + 25}
           left={lastHorizontalSpace + (column % 2 === 0 ? 0 : HORIZONTAL_SPACE)}
@@ -55,7 +57,11 @@ export default () => {
     <Container>
       <AppContainer>
         <EditorContainer>
-          <Editor selectedCell={selectedCell} />
+          <Editor
+            map={map}
+            onMapChange={map => setMap(map)}
+            selectedCell={selectedCell}
+          />
         </EditorContainer>
         <MapContainer>
           <MapInnerContainer>{hexes}</MapInnerContainer>
