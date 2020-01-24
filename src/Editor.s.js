@@ -4,8 +4,8 @@ export const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 40px 10%;
-  min-height: 1090px;
+  padding: 0 10%;
+  min-height: 1200px;
   position: relative;
 `;
 
@@ -17,7 +17,11 @@ export const Card = styled.div`
   justify-content: center;
   background: white;
   border-radius: 4px;
-  padding: 40px;
+  padding: 20px;
+
+  @media (min-width: 2560px) {
+    padding: 40px;
+  }
 `;
 
 export const Title = styled.span`
@@ -25,6 +29,7 @@ export const Title = styled.span`
   font-weight: 600;
   color: white;
   margin-bottom: 20px;
+  margin-top: 40px;
 `;
 
 export const CellNumber = styled.span`
@@ -57,7 +62,7 @@ export const EmptyCellText = styled.span`
 `;
 
 export const Gutter = styled.div`
-  margin-bottom: 78px;
+  margin-bottom: 118px;
 `;
 
 export const Label = styled.div`

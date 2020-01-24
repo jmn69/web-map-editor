@@ -13,7 +13,7 @@ import {
 import Editor from './Editor';
 
 const VERTICAL_SPACE = 50;
-const HORIZONTAL_SPACE = 30;
+const HORIZONTAL_SPACE = 40;
 const WIDTH = 60;
 const initialMap = { cells: [] };
 
@@ -35,7 +35,9 @@ export default () => {
           onClick={() => setSelectedCell({ column, row })}
           key={`${column}-${row}`}
           bottom={lastVerticalSpace}
-          left={lastHorizontalSpace + (column % 2 === 0 ? 0 : HORIZONTAL_SPACE)}
+          left={
+            lastHorizontalSpace + (column % 2 === 0 ? 10 : HORIZONTAL_SPACE)
+          }
         >
           <Hexagone fieldType={foundCellInMap && foundCellInMap.fieldType} />
         </HexagoneWrapper>
@@ -45,8 +47,12 @@ export default () => {
           onClick={() => setSelectedCell({ column, row })}
           key={`${column}-${row}-content`}
           bottom={lastVerticalSpace + 25}
-          left={lastHorizontalSpace + (column % 2 === 0 ? 0 : HORIZONTAL_SPACE)}
-        >{`${column}-${row}`}</ContentWrapper>
+          left={
+            lastHorizontalSpace + (column % 2 === 0 ? 10 : HORIZONTAL_SPACE)
+          }
+        >
+          {`${column}-${row}`}
+        </ContentWrapper>
       );
       lastVerticalSpace += VERTICAL_SPACE;
     }

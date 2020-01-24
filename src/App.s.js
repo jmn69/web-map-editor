@@ -26,19 +26,19 @@ export const MapContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 1090px;
+  min-height: 1200px;
 `;
 
 export const MapInnerContainer = styled.div`
   position: relative;
-  width: 1052px;
-  height: 1090px;
+  width: 1072px;
+  height: 1200px;
 `;
 
 export const EditorContainer = styled.div`
   flex: 1;
   background: ${props => props.theme.colors.primary};
-  min-height: 1090px;
+  min-height: 1200px;
   min-width: 350px;
 `;
 
