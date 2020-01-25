@@ -50,6 +50,7 @@ export const ContentWrapper = styled.div`
   text-align: center;
   width: 60px;
   cursor: pointer;
+  user-select: none;
 `;
 
 export const ToolbarWrapper = styled.div`

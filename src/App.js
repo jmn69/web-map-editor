@@ -1,14 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { library } from '@fortawesome/fontawesome-svg-core';
+import { ToastContainer } from 'react-toastify';
 import {
   faCircleNotch,
   faWater,
   faEraser,
   faSeedling,
   faUmbrellaBeach,
+  faFileDownload,
+  faFileUpload,
 } from '@fortawesome/free-solid-svg-icons';
+import 'react-toastify/dist/ReactToastify.css';
 
-import { VERTICAL_SPACE, HORIZONTAL_SPACE, WIDTH } from 'common/constants';
+import {
+  VERTICAL_SPACE,
+  HORIZONTAL_SPACE,
+  WIDTH,
+  COLUMNS,
+  ROWS,
+} from 'common/constants';
 
 import {
   Container,
@@ -23,7 +33,15 @@ import Editor from './Editor';
 import Toolbar from './Toolbar';
 import Hexagone from './Hexagone';
 
-library.add(faCircleNotch, faWater, faEraser, faSeedling, faUmbrellaBeach);
+library.add(
+  faCircleNotch,
+  faWater,
+  faEraser,
+  faSeedling,
+  faUmbrellaBeach,
+  faFileDownload,
+  faFileUpload
+);
 
 const initialMap = { cells: [] };
 
@@ -34,6 +52,8 @@ const actionTofieldType = {
   '3': '2', // Water
   null: null, // No action
 };
+
+const numberOfCells = COLUMNS * ROWS;
 
 export default () => {
   const [map, setMap] = useState(initialMap);
@@ -123,12 +143,30 @@ export default () => {
     }
   };
 
+  const handleDownloadClick = () => {
+    const jsonMap = JSON.stringify(map);
+    const dataStr = `data:text/json;charset=utf-8,${encodeURIComponent(
+      jsonMap
+    )}`;
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute('href', dataStr);
+    downloadAnchorNode.setAttribute('download', 'map.json');
+    document.body.appendChild(downloadAnchorNode); // required for firefox
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+  };
+
+  const handleUploadClick = event => {
+    const map = JSON.parse(event.target.result);
+    setMap(map);
+  };
+
   const hexes = [];
 
   let lastHorizontalSpace = 0;
-  for (let row = 0; row < 17; row++) {
+  for (let row = 0; row < ROWS; row++) {
     let lastVerticalSpace = 20;
-    for (let column = 0; column < 21; column++) {
+    for (let column = 0; column < COLUMNS; column++) {
       const foundCellInMap = map.cells.find(
         cell => cell.column === column && cell.row === row
       );
@@ -164,6 +202,7 @@ export default () => {
 
   return (
     <Container>
+      <ToastContainer autoClose={8000} style={{ zIndex: 30000 }} />
       <AppContainer>
         <EditorContainer>
           <Editor
@@ -176,6 +215,9 @@ export default () => {
           <MapInnerContainer>
             <ToolbarWrapper>
               <Toolbar
+                onDownloadClick={handleDownloadClick}
+                onUploadClick={handleUploadClick}
+                isDownloadEnabled={numberOfCells === map.cells.length}
                 onActionClick={handleActionClick}
                 currentAction={currentAction}
               />
