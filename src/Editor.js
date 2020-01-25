@@ -57,7 +57,7 @@ const Editor = ({ selectedCell, map, onMapChange }) => {
   }, [selectedCell, lastSelectedCell]);
 
   const onFieldTypeChange = selectedOption => {
-    let mapToUpdate = { ...map };
+    const mapToUpdate = { ...map };
     const foundCell = mapToUpdate.cells.find(
       cell =>
         cell.column === selectedCell.column && cell.row === selectedCell.row
@@ -70,9 +70,9 @@ const Editor = ({ selectedCell, map, onMapChange }) => {
     };
 
     if (foundCell) {
-      mapToUpdate = map.cells.filter(
+      mapToUpdate.cells = map.cells.filter(
         cell =>
-          cell.column !== selectedCell.column && cell.row !== selectedCell.row
+          cell.column !== selectedCell.column || cell.row !== selectedCell.row
       );
     }
     mapToUpdate.cells.push(cellToUpdate);
@@ -92,9 +92,9 @@ const Editor = ({ selectedCell, map, onMapChange }) => {
           options={fieldTypeOptions}
           components={{ MenuPortal }}
           menuPortalTarget={document.body}
-          menuPlacement="auto"
-          menuPosition="absolute"
-          placeholder="Sélectionnez un élément de paysage"
+          menuPlacement='auto'
+          menuPosition='absolute'
+          placeholder='Sélectionnez un élément de paysage'
         />
         {selectedFieldType && selectedFieldType.label}
       </ContentContainer>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faCircleNotch,
@@ -8,12 +8,12 @@ import {
   faUmbrellaBeach,
 } from '@fortawesome/free-solid-svg-icons';
 
+import { VERTICAL_SPACE, HORIZONTAL_SPACE, WIDTH } from 'common/constants';
+
 import {
   Container,
   AppContainer,
   MapContainer,
-  HexagoneWrapper,
-  Hexagone,
   ContentWrapper,
   EditorContainer,
   MapInnerContainer,
@@ -21,17 +21,107 @@ import {
 } from './App.s';
 import Editor from './Editor';
 import Toolbar from './Toolbar';
+import Hexagone from './Hexagone';
 
 library.add(faCircleNotch, faWater, faEraser, faSeedling, faUmbrellaBeach);
 
-const VERTICAL_SPACE = 50;
-const HORIZONTAL_SPACE = 40;
-const WIDTH = 60;
 const initialMap = { cells: [] };
+
+const actionTofieldType = {
+  O: null, // Eraser
+  '1': '0', // Plain
+  '2': '1', // Sand
+  '3': '2', // Water
+  null: null, // No action
+};
 
 export default () => {
   const [map, setMap] = useState(initialMap);
   const [selectedCell, setSelectedCell] = useState(null);
+  const [currentAction, setCurrentAction] = useState(null);
+  const [isShiftHold, setIsShiftHold] = useState(false);
+
+  useEffect(() => {
+    document.addEventListener('keyup', event => {
+      if (event.defaultPrevented) {
+        return;
+      }
+
+      const key = event.key || event.keyCode;
+
+      if (key === 'Shift' || key === 16) {
+        setIsShiftHold(false);
+      }
+    });
+
+    document.addEventListener('keydown', event => {
+      if (event.defaultPrevented) {
+        return;
+      }
+
+      const key = event.key || event.keyCode;
+
+      if (key === 'Shift' || key === 16) {
+        setIsShiftHold(true);
+      }
+    });
+  }, []);
+
+  const handleActionClick = action => {
+    if (currentAction === action) {
+      setCurrentAction(null);
+    }
+ else {
+      setCurrentAction(action);
+    }
+  };
+
+  const handleHexaMouseEnter = (column, row) => {
+    if (currentAction !== null && currentAction !== undefined && isShiftHold) {
+      const mapToUpdate = { ...map };
+      const foundCell = mapToUpdate.cells.find(
+        cell => cell.column === column && cell.row === row
+      );
+      const cellToUpdate = {
+        ...foundCell,
+        fieldType: actionTofieldType[currentAction],
+        column,
+        row,
+      };
+
+      if (foundCell) {
+        mapToUpdate.cells = map.cells.filter(
+          cell => cell.column !== column || cell.row !== row
+        );
+      }
+      mapToUpdate.cells.push(cellToUpdate);
+      setMap(mapToUpdate);
+    }
+  };
+
+  const handleCellClick = (column, row) => {
+    setSelectedCell({ column, row });
+    if (currentAction !== null && currentAction !== undefined) {
+      const mapToUpdate = { ...map };
+      const foundCell = mapToUpdate.cells.find(
+        cell => cell.column === column && cell.row === row
+      );
+      const cellToUpdate = {
+        ...foundCell,
+        fieldType: actionTofieldType[currentAction],
+        column,
+        row,
+      };
+
+      if (foundCell) {
+        mapToUpdate.cells = map.cells.filter(
+          cell => cell.column !== column || cell.row !== row
+        );
+      }
+      mapToUpdate.cells.push(cellToUpdate);
+      setMap(mapToUpdate);
+    }
+  };
 
   const hexes = [];
 
@@ -43,20 +133,21 @@ export default () => {
         cell => cell.column === column && cell.row === row
       );
       hexes.push(
-        <HexagoneWrapper
-          onClick={() => setSelectedCell({ column, row })}
+        <Hexagone
+          column={column}
+          onHexaMouseEnter={handleHexaMouseEnter}
+          row={row}
+          onCellClick={handleCellClick}
           key={`${column}-${row}`}
-          bottom={lastVerticalSpace}
-          left={
-            lastHorizontalSpace + (column % 2 === 0 ? 10 : HORIZONTAL_SPACE)
-          }
-        >
-          <Hexagone fieldType={foundCellInMap && foundCellInMap.fieldType} />
-        </HexagoneWrapper>
+          lastVerticalSpace={lastVerticalSpace}
+          lastHorizontalSpace={lastHorizontalSpace}
+          foundCellInMap={foundCellInMap}
+        />
       );
       hexes.push(
         <ContentWrapper
-          onClick={() => setSelectedCell({ column, row })}
+          onMouseEnter={() => handleHexaMouseEnter(column, row)}
+          onClick={() => handleCellClick(column, row)}
           key={`${column}-${row}-content`}
           bottom={lastVerticalSpace + 25}
           left={
@@ -84,7 +175,10 @@ export default () => {
         <MapContainer>
           <MapInnerContainer>
             <ToolbarWrapper>
-              <Toolbar />
+              <Toolbar
+                onActionClick={handleActionClick}
+                currentAction={currentAction}
+              />
             </ToolbarWrapper>
             {hexes}
           </MapInnerContainer>

@@ -15,6 +15,10 @@ export default styled.div`
   cursor: pointer;
   box-sizing: border-box;
   overflow: hidden;
+  opacity: ${props => (props.isHover ? '1' : '0.7')};
+
+  border: ${props =>
+    props.isHover ? `2px solid ${props.theme.colors.accentLight}` : 'none'};
 
   &:hover {
     border: 3px solid ${props => props.theme.colors.accentLight};
