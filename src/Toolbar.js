@@ -1,21 +1,45 @@
-import React from 'react';
+import React, { useState } from 'react';
 import T from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import ReactTooltip from 'react-tooltip';
 import { toast } from 'react-toastify';
+import {
+  FloatingMenu,
+  MainButton,
+  ChildButton,
+} from 'react-floating-button-menu';
 
 import Circle from 'common/components/Circle';
 import { ToolbarActionEnum } from 'common/constants';
 
 import { Container, CircleWrapper, ButtonContainer } from './Toolbar.s';
 
+const fieldTypeActionIcon = {
+  [ToolbarActionEnum.water]: (
+    <FontAwesomeIcon size='2x' color='#1C9EFF' icon='water' />
+  ),
+  [ToolbarActionEnum.plain]: (
+    <FontAwesomeIcon size='2x' color='#00D41B' icon='seedling' />
+  ),
+  [ToolbarActionEnum.sand]: (
+    <FontAwesomeIcon size='2x' color='#FFF6A0' icon='umbrella-beach' />
+  ),
+  null: <FontAwesomeIcon size='2x' color='gray' icon='plus' />,
+};
+
 const Toolbar = ({
-  onActionClick,
-  currentAction,
+  onActionFieldTypeClick,
+  currentFieldTypeAction,
   onDownloadClick,
   isDownloadEnabled,
   onUploadClick,
+  onEraserClick,
+  isEraserEnabled,
+  isCoordsEnabled,
+  onCoordsClick,
 }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
   const handleDownloadClick = () => {
     if (isDownloadEnabled) {
       onDownloadClick();
@@ -27,53 +51,114 @@ const Toolbar = ({
     }
   };
 
+  const handleWaterClick = () => {
+    onActionFieldTypeClick(ToolbarActionEnum.water);
+    setIsOpen(false);
+  };
+
+  const handleSandClick = () => {
+    onActionFieldTypeClick(ToolbarActionEnum.sand);
+    setIsOpen(false);
+  };
+
+  const handlePlainClick = () => {
+    onActionFieldTypeClick(ToolbarActionEnum.plain);
+    setIsOpen(false);
+  };
+
   return (
     <Container>
       <ButtonContainer>
         <CircleWrapper>
           <Circle
-            onClick={() => onActionClick(ToolbarActionEnum.eraser)}
+            onClick={onCoordsClick}
+            data-tip
+            data-for='coords'
+            bg='white'
+            isHover={isCoordsEnabled}
+          >
+            <FontAwesomeIcon size='lg' color='gray' icon='superscript' />
+          </Circle>
+        </CircleWrapper>
+        <CircleWrapper>
+          <Circle
+            onClick={onEraserClick}
             data-tip
             data-for='eraser'
             bg='white'
-            isHover={currentAction === ToolbarActionEnum.eraser}
+            isHover={isEraserEnabled}
           >
             <FontAwesomeIcon size='lg' color='#e4a1bb' icon='eraser' />
           </Circle>
         </CircleWrapper>
-        <CircleWrapper>
-          <Circle
-            onClick={() => onActionClick(ToolbarActionEnum.water)}
-            data-tip
-            data-for='water'
-            bg='white'
-            isHover={currentAction === ToolbarActionEnum.water}
+        <ButtonContainer>
+          <FloatingMenu
+            slideSpeed={500}
+            direction='down'
+            spacing={8}
+            isOpen={isOpen}
+            style={{ position: 'absolute', top: 0 }}
           >
-            <FontAwesomeIcon size='2x' color='#1C9EFF' icon='water' />
-          </Circle>
-        </CircleWrapper>
-        <CircleWrapper>
-          <Circle
-            onClick={() => onActionClick(ToolbarActionEnum.plain)}
-            data-tip
-            data-for='plain'
-            bg='white'
-            isHover={currentAction === ToolbarActionEnum.plain}
-          >
-            <FontAwesomeIcon size='2x' color='#00D41B' icon='seedling' />
-          </Circle>
-        </CircleWrapper>
-        <CircleWrapper>
-          <Circle
-            onClick={() => onActionClick(ToolbarActionEnum.sand)}
-            data-tip
-            data-for='sand'
-            bg='white'
-            isHover={currentAction === ToolbarActionEnum.sand}
-          >
-            <FontAwesomeIcon size='2x' color='#FFF6A0' icon='umbrella-beach' />
-          </Circle>
-        </CircleWrapper>
+            <MainButton
+              data-tip
+              data-for='fieldType'
+              background='white'
+              iconResting={fieldTypeActionIcon[currentFieldTypeAction]}
+              iconActive={
+                <FontAwesomeIcon size='2x' color='gray' icon='times' />
+              }
+              icon={fieldTypeActionIcon[currentFieldTypeAction]}
+              onClick={() => setIsOpen(!isOpen)}
+              size={60}
+            />
+            <ChildButton
+              data-tip
+              data-for='water'
+              icon={
+                currentFieldTypeAction === ToolbarActionEnum.water ? (
+                  <FontAwesomeIcon size='2x' color='gray' icon='undo-alt' />
+                ) : (
+                  <FontAwesomeIcon size='2x' color='#1C9EFF' icon='water' />
+                )
+              }
+              background='white'
+              size={45}
+              onClick={handleWaterClick}
+            />
+            <ChildButton
+              data-tip
+              data-for='plain'
+              icon={
+                currentFieldTypeAction === ToolbarActionEnum.plain ? (
+                  <FontAwesomeIcon size='2x' color='gray' icon='undo-alt' />
+                ) : (
+                  <FontAwesomeIcon size='2x' color='#00D41B' icon='seedling' />
+                )
+              }
+              background='white'
+              size={45}
+              onClick={handlePlainClick}
+            />
+            <ChildButton
+              data-tip
+              data-for='sand'
+              icon={
+                currentFieldTypeAction === ToolbarActionEnum.sand ? (
+                  <FontAwesomeIcon size='2x' color='gray' icon='undo-alt' />
+                ) : (
+                  <FontAwesomeIcon
+                    size='2x'
+                    color='#FFF6A0'
+                    icon='umbrella-beach'
+                  />
+                )
+              }
+              background='white'
+              size={45}
+              onClick={handleSandClick}
+            />
+          </FloatingMenu>
+        </ButtonContainer>
       </ButtonContainer>
       <ButtonContainer>
         <CircleWrapper>
@@ -124,29 +209,35 @@ const Toolbar = ({
       <ReactTooltip
         className='menuTooltip'
         id='water'
-        place='bottom'
+        place='right'
         type='dark'
         effect='solid'
       >
-        Eau
+        {currentFieldTypeAction === ToolbarActionEnum.water
+          ? "Désactiver l'éditeur d'eau"
+          : 'Eau'}
       </ReactTooltip>
       <ReactTooltip
         className='menuTooltip'
         id='plain'
-        place='bottom'
+        place='right'
         type='dark'
         effect='solid'
       >
-        Plaine
+        {currentFieldTypeAction === ToolbarActionEnum.plain
+          ? "Désactiver l'éditeur de plaine"
+          : 'Plaine'}
       </ReactTooltip>
       <ReactTooltip
         className='menuTooltip'
         id='sand'
-        place='bottom'
+        place='right'
         type='dark'
         effect='solid'
       >
-        Désert
+        {currentFieldTypeAction === ToolbarActionEnum.sand
+          ? "Désactiver l'éditeur de désert"
+          : 'Désert'}
       </ReactTooltip>
       <ReactTooltip
         className='menuTooltip'
@@ -166,19 +257,41 @@ const Toolbar = ({
       >
         Chargement du fichier json
       </ReactTooltip>
+      <ReactTooltip
+        className='menuTooltip'
+        id='fieldType'
+        place='bottom'
+        type='dark'
+        effect='solid'
+      >
+        Paysages
+      </ReactTooltip>
+      <ReactTooltip
+        className='menuTooltip'
+        id='coords'
+        place='bottom'
+        type='dark'
+        effect='solid'
+      >
+        Coordonnées
+      </ReactTooltip>
     </Container>
   );
 };
 
 Toolbar.propTypes = {
-  onActionClick: T.func.isRequired,
-  currentAction: T.number,
+  onEraserClick: T.func.isRequired,
+  isEraserEnabled: T.bool.isRequired,
+  onActionFieldTypeClick: T.func.isRequired,
+  currentFieldTypeAction: T.number,
   onDownloadClick: T.func.isRequired,
   isDownloadEnabled: T.bool.isRequired,
+  isCoordsEnabled: T.bool.isRequired,
+  onCoordsClick: T.func.isRequired,
 };
 
 Toolbar.defaultProps = {
-  currentAction: null,
+  currentFieldTypeAction: null,
 };
 
 export default Toolbar;

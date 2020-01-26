@@ -9,6 +9,10 @@ import {
   faUmbrellaBeach,
   faFileDownload,
   faFileUpload,
+  faPlus,
+  faTimes,
+  faUndoAlt,
+  faSuperscript,
 } from '@fortawesome/free-solid-svg-icons';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -40,13 +44,16 @@ library.add(
   faSeedling,
   faUmbrellaBeach,
   faFileDownload,
-  faFileUpload
+  faFileUpload,
+  faPlus,
+  faTimes,
+  faUndoAlt,
+  faSuperscript
 );
 
 const initialMap = { cells: [] };
 
 const actionTofieldType = {
-  O: null, // Eraser
   '1': '0', // Plain
   '2': '1', // Sand
   '3': '2', // Water
@@ -58,8 +65,10 @@ const numberOfCells = COLUMNS * ROWS;
 export default () => {
   const [map, setMap] = useState(initialMap);
   const [selectedCell, setSelectedCell] = useState(null);
-  const [currentAction, setCurrentAction] = useState(null);
+  const [currentFieldTypeAction, setCurrentFieldTypeAction] = useState(null);
   const [isShiftHold, setIsShiftHold] = useState(false);
+  const [isEraserEnabled, setIsEraserEnabled] = useState(false);
+  const [isCoordsEnabled, setIsCoordsEnabled] = useState(false);
 
   useEffect(() => {
     document.addEventListener('keyup', event => {
@@ -87,24 +96,25 @@ export default () => {
     });
   }, []);
 
-  const handleActionClick = action => {
-    if (currentAction === action) {
-      setCurrentAction(null);
+  const handleFieldTypeActionClick = action => {
+    setIsEraserEnabled(false);
+    if (currentFieldTypeAction === action) {
+      setCurrentFieldTypeAction(null);
     }
  else {
-      setCurrentAction(action);
+      setCurrentFieldTypeAction(action);
     }
   };
 
   const handleHexaMouseEnter = (column, row) => {
-    if (currentAction !== null && currentAction !== undefined && isShiftHold) {
+    if (isShiftHold && (isEraserEnabled || currentFieldTypeAction)) {
       const mapToUpdate = { ...map };
       const foundCell = mapToUpdate.cells.find(
         cell => cell.column === column && cell.row === row
       );
       const cellToUpdate = {
         ...foundCell,
-        fieldType: actionTofieldType[currentAction],
+        fieldType: actionTofieldType[currentFieldTypeAction],
         column,
         row,
       };
@@ -121,14 +131,14 @@ export default () => {
 
   const handleCellClick = (column, row) => {
     setSelectedCell({ column, row });
-    if (currentAction !== null && currentAction !== undefined) {
+    if (isEraserEnabled || currentFieldTypeAction) {
       const mapToUpdate = { ...map };
       const foundCell = mapToUpdate.cells.find(
         cell => cell.column === column && cell.row === row
       );
       const cellToUpdate = {
         ...foundCell,
-        fieldType: actionTofieldType[currentAction],
+        fieldType: actionTofieldType[currentFieldTypeAction],
         column,
         row,
       };
@@ -141,6 +151,19 @@ export default () => {
       mapToUpdate.cells.push(cellToUpdate);
       setMap(mapToUpdate);
     }
+  };
+
+  const disableCurrentActions = () => {
+    setCurrentFieldTypeAction(null);
+  };
+
+  const handleEraserClick = () => {
+    disableCurrentActions();
+    setIsEraserEnabled(!isEraserEnabled);
+  };
+
+  const handleCoordsClick = () => {
+    setIsCoordsEnabled(!isCoordsEnabled);
   };
 
   const handleDownloadClick = () => {
@@ -182,19 +205,21 @@ export default () => {
           foundCellInMap={foundCellInMap}
         />
       );
-      hexes.push(
-        <ContentWrapper
-          onMouseEnter={() => handleHexaMouseEnter(column, row)}
-          onClick={() => handleCellClick(column, row)}
-          key={`${column}-${row}-content`}
-          bottom={lastVerticalSpace + 25}
-          left={
-            lastHorizontalSpace + (column % 2 === 0 ? 10 : HORIZONTAL_SPACE)
-          }
-        >
-          {`${column}-${row}`}
-        </ContentWrapper>
-      );
+      if (isCoordsEnabled) {
+        hexes.push(
+          <ContentWrapper
+            onMouseEnter={() => handleHexaMouseEnter(column, row)}
+            onClick={() => handleCellClick(column, row)}
+            key={`${column}-${row}-content`}
+            bottom={lastVerticalSpace + 25}
+            left={
+              lastHorizontalSpace + (column % 2 === 0 ? 10 : HORIZONTAL_SPACE)
+            }
+          >
+            {`${column}-${row}`}
+          </ContentWrapper>
+        );
+      }
       lastVerticalSpace += VERTICAL_SPACE;
     }
     lastHorizontalSpace += WIDTH;
@@ -215,11 +240,15 @@ export default () => {
           <MapInnerContainer>
             <ToolbarWrapper>
               <Toolbar
+                isEraserEnabled={isEraserEnabled}
+                onEraserClick={handleEraserClick}
                 onDownloadClick={handleDownloadClick}
                 onUploadClick={handleUploadClick}
                 isDownloadEnabled={numberOfCells === map.cells.length}
-                onActionClick={handleActionClick}
-                currentAction={currentAction}
+                onActionFieldTypeClick={handleFieldTypeActionClick}
+                currentFieldTypeAction={currentFieldTypeAction}
+                onCoordsClick={handleCoordsClick}
+                isCoordsEnabled={isCoordsEnabled}
               />
             </ToolbarWrapper>
             {hexes}

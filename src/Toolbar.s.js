@@ -14,4 +14,5 @@ export const CircleWrapper = styled.div`
 
 export const ButtonContainer = styled.div`
   display: flex;
+  position: relative;
 `;
