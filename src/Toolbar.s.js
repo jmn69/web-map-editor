@@ -6,6 +6,7 @@ export const Container = styled.div`
   padding: 0 20px;
   align-items: center;
   justify-content: space-between;
+  overflow: ${props => (props.hidden ? 'hidden' : 'unset')};
 `;
 
 export const CircleWrapper = styled.div`

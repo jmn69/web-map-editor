@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import T from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import ReactTooltip from 'react-tooltip';
@@ -53,6 +53,17 @@ const Toolbar = ({
 }) => {
   const [isFieldTypeOpen, setFieldTypeIsOpen] = useState(false);
   const [isFieldObjectOpen, setFieldObjectIsOpen] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
+
+  useEffect(() => {
+    let timer;
+    if (!isFieldTypeOpen && !isFieldObjectOpen) {
+      timer = setTimeout(() => {
+        setIsHidden(true);
+      }, 300);
+    }
+    return () => clearTimeout(timer);
+  }, [isFieldObjectOpen, isFieldTypeOpen]);
 
   const handleDownloadClick = () => {
     if (isDownloadEnabled) {
@@ -91,7 +102,7 @@ const Toolbar = ({
   };
 
   return (
-    <Container>
+    <Container hidden={isHidden}>
       <ButtonContainer>
         <CircleWrapper>
           <Circle
@@ -131,7 +142,12 @@ const Toolbar = ({
               iconActive={
                 <FontAwesomeIcon size='2x' color='gray' icon='times' />
               }
-              onClick={() => setFieldTypeIsOpen(!isFieldTypeOpen)}
+              onClick={() => {
+                setFieldTypeIsOpen(!isFieldTypeOpen);
+                if (!isFieldObjectOpen) {
+                  setIsHidden(false);
+                }
+              }}
               size={60}
             />
             <ChildButton
@@ -198,7 +214,12 @@ const Toolbar = ({
               iconActive={
                 <FontAwesomeIcon size='2x' color='gray' icon='times' />
               }
-              onClick={() => setFieldObjectIsOpen(!isFieldObjectOpen)}
+              onClick={() => {
+                setFieldObjectIsOpen(!isFieldTypeOpen);
+                if (!isFieldObjectOpen) {
+                  setIsHidden(false);
+                }
+              }}
               size={60}
             />
             <ChildButton
