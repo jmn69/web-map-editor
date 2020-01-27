@@ -13,6 +13,7 @@ const Hexagone = ({
   lastHorizontalSpace,
   foundCellInMap,
   onHexaMouseEnter,
+  isSelected,
 }) => {
   const handleCellClick = () => {
     onCellClick(column, row);
@@ -29,7 +30,10 @@ const Hexagone = ({
       bottom={lastVerticalSpace}
       left={lastHorizontalSpace + (column % 2 === 0 ? 10 : HORIZONTAL_SPACE)}
     >
-      <HexagoneStyled fieldType={foundCellInMap && foundCellInMap.fieldType} />
+      <HexagoneStyled
+        isSelected={isSelected}
+        fieldType={foundCellInMap && foundCellInMap.fieldType}
+      />
     </Container>
   );
 };
@@ -42,6 +46,7 @@ Hexagone.propTypes = {
   lastVerticalSpace: T.number.isRequired,
   lastHorizontalSpace: T.number.isRequired,
   foundCellInMap: T.any,
+  isSelected: T.bool.isRequired,
 };
 
 Hexagone.defaultProps = {

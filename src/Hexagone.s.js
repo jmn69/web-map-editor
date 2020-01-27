@@ -37,7 +37,9 @@ export const HexagoneStyled = styled.div`
   cursor: pointer;
   z-index: 1;
 
-  background-color: ${props => fieldTypes[props.fieldType]};
+  background-color: ${props =>
+    props.isSelected ? 'rgb(255, 86, 19)' : fieldTypes[props.fieldType]};
+  opacity: ${props => (props.isSelected ? '0.4' : '1')};
 
   &:hover {
     border-left: solid 1px ${props => props.theme.colors.accent};

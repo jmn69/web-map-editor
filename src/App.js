@@ -261,6 +261,11 @@ export default () => {
           lastVerticalSpace={lastVerticalSpace}
           lastHorizontalSpace={lastHorizontalSpace}
           foundCellInMap={foundCellInMap}
+          isSelected={
+            selectedCell &&
+            selectedCell.column === column &&
+            selectedCell.row === row
+          }
         />
       );
       if (isCoordsEnabled || (foundCellInMap && foundCellInMap.fieldObject)) {
