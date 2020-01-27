@@ -162,25 +162,29 @@ export default () => {
   };
 
   const handleHexaMouseEnter = (column, row) => {
-    if (isShiftHold && (isEraserEnabled || currentFieldTypeAction)) {
-      const mapToUpdate = { ...map };
-      const foundCell = mapToUpdate.cells.find(
-        cell => cell.column === column && cell.row === row
-      );
-      const cellToUpdate = {
-        ...foundCell,
-        fieldType: actionToUnityValue[currentFieldTypeAction],
-        column,
-        row,
-      };
-
-      if (foundCell) {
-        mapToUpdate.cells = map.cells.filter(
-          cell => cell.column !== column || cell.row !== row
-        );
+    if (isShiftHold) {
+      if (isEraserEnabled) {
+        updateMapCell(column, row, [
+          { propName: 'fieldType', value: null },
+          { propName: 'fieldObject', value: null },
+        ]);
       }
-      mapToUpdate.cells.push(cellToUpdate);
-      setMap(mapToUpdate);
+ else {
+        const fieldsToUpdate = [];
+        if (currentFieldTypeAction) {
+          fieldsToUpdate.push({
+            propName: 'fieldType',
+            value: actionToUnityValue[currentFieldTypeAction],
+          });
+        }
+        if (currentFieldObjectAction) {
+          fieldsToUpdate.push({
+            propName: 'fieldObject',
+            value: actionToUnityValue[currentFieldObjectAction],
+          });
+        }
+        updateMapCell(column, row, fieldsToUpdate);
+      }
     }
   };
 
