@@ -14,5 +14,11 @@ export const CircleWrapper = styled.div`
 
 export const ButtonContainer = styled.div`
   display: flex;
+`;
+
+export const FloatingMenuContainer = styled.div`
+  display: flex;
   position: relative;
+  width: 60px;
+  margin-right: 20px;
 `;

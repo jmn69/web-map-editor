@@ -12,9 +12,14 @@ import {
 import Circle from 'common/components/Circle';
 import { ToolbarActionEnum } from 'common/constants';
 
-import { Container, CircleWrapper, ButtonContainer } from './Toolbar.s';
+import {
+  Container,
+  CircleWrapper,
+  ButtonContainer,
+  FloatingMenuContainer,
+} from './Toolbar.s';
 
-const fieldTypeActionIcon = {
+const actionIcons = {
   [ToolbarActionEnum.water]: (
     <FontAwesomeIcon size='2x' color='#1C9EFF' icon='water' />
   ),
@@ -24,7 +29,13 @@ const fieldTypeActionIcon = {
   [ToolbarActionEnum.sand]: (
     <FontAwesomeIcon size='2x' color='#FFF6A0' icon='umbrella-beach' />
   ),
-  null: <FontAwesomeIcon size='2x' color='gray' icon='plus' />,
+  [ToolbarActionEnum.sandbag]: (
+    <FontAwesomeIcon size='2x' color='#100916' icon='suitcase' />
+  ),
+  [ToolbarActionEnum.barbed]: (
+    <FontAwesomeIcon size='2x' color='#100916' icon='won-sign' />
+  ),
+  null: <FontAwesomeIcon size='2x' color='#ff5613' icon='plus' />,
 };
 
 const Toolbar = ({
@@ -37,8 +48,11 @@ const Toolbar = ({
   isEraserEnabled,
   isCoordsEnabled,
   onCoordsClick,
+  currentFieldObjectAction,
+  onActionFieldObjectClick,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isFieldTypeOpen, setFieldTypeIsOpen] = useState(false);
+  const [isFieldObjectOpen, setFieldObjectIsOpen] = useState(false);
 
   const handleDownloadClick = () => {
     if (isDownloadEnabled) {
@@ -53,17 +67,27 @@ const Toolbar = ({
 
   const handleWaterClick = () => {
     onActionFieldTypeClick(ToolbarActionEnum.water);
-    setIsOpen(false);
+    setFieldTypeIsOpen(false);
   };
 
   const handleSandClick = () => {
     onActionFieldTypeClick(ToolbarActionEnum.sand);
-    setIsOpen(false);
+    setFieldTypeIsOpen(false);
   };
 
   const handlePlainClick = () => {
     onActionFieldTypeClick(ToolbarActionEnum.plain);
-    setIsOpen(false);
+    setFieldTypeIsOpen(false);
+  };
+
+  const handleBarbedClick = () => {
+    onActionFieldObjectClick(ToolbarActionEnum.barbed);
+    setFieldObjectIsOpen(false);
+  };
+
+  const handleSandbagClick = () => {
+    onActionFieldObjectClick(ToolbarActionEnum.sandbag);
+    setFieldObjectIsOpen(false);
   };
 
   return (
@@ -91,24 +115,23 @@ const Toolbar = ({
             <FontAwesomeIcon size='lg' color='#e4a1bb' icon='eraser' />
           </Circle>
         </CircleWrapper>
-        <ButtonContainer>
+        <FloatingMenuContainer>
           <FloatingMenu
             slideSpeed={500}
             direction='down'
             spacing={8}
-            isOpen={isOpen}
+            isOpen={isFieldTypeOpen}
             style={{ position: 'absolute', top: 0 }}
           >
             <MainButton
               data-tip
               data-for='fieldType'
               background='white'
-              iconResting={fieldTypeActionIcon[currentFieldTypeAction]}
+              iconResting={actionIcons[currentFieldTypeAction]}
               iconActive={
                 <FontAwesomeIcon size='2x' color='gray' icon='times' />
               }
-              icon={fieldTypeActionIcon[currentFieldTypeAction]}
-              onClick={() => setIsOpen(!isOpen)}
+              onClick={() => setFieldTypeIsOpen(!isFieldTypeOpen)}
               size={60}
             />
             <ChildButton
@@ -158,7 +181,56 @@ const Toolbar = ({
               onClick={handleSandClick}
             />
           </FloatingMenu>
-        </ButtonContainer>
+        </FloatingMenuContainer>
+        <FloatingMenuContainer>
+          <FloatingMenu
+            slideSpeed={500}
+            direction='down'
+            spacing={8}
+            isOpen={isFieldObjectOpen}
+            style={{ position: 'absolute', top: 0 }}
+          >
+            <MainButton
+              data-tip
+              data-for='fieldObject'
+              background='white'
+              iconResting={actionIcons[currentFieldObjectAction]}
+              iconActive={
+                <FontAwesomeIcon size='2x' color='gray' icon='times' />
+              }
+              onClick={() => setFieldObjectIsOpen(!isFieldObjectOpen)}
+              size={60}
+            />
+            <ChildButton
+              data-tip
+              data-for='barbed'
+              icon={
+                currentFieldObjectAction === ToolbarActionEnum.barbed ? (
+                  <FontAwesomeIcon size='2x' color='gray' icon='undo-alt' />
+                ) : (
+                  <FontAwesomeIcon size='2x' color='#100916' icon='won-sign' />
+                )
+              }
+              background='white'
+              size={45}
+              onClick={handleBarbedClick}
+            />
+            <ChildButton
+              data-tip
+              data-for='sandbag'
+              icon={
+                currentFieldObjectAction === ToolbarActionEnum.sandbag ? (
+                  <FontAwesomeIcon size='2x' color='gray' icon='undo-alt' />
+                ) : (
+                  <FontAwesomeIcon size='2x' color='#100916' icon='suitcase' />
+                )
+              }
+              background='white'
+              size={45}
+              onClick={handleSandbagClick}
+            />
+          </FloatingMenu>
+        </FloatingMenuContainer>
       </ButtonContainer>
       <ButtonContainer>
         <CircleWrapper>
@@ -275,6 +347,33 @@ const Toolbar = ({
       >
         Coordonnées
       </ReactTooltip>
+      <ReactTooltip
+        className='menuTooltip'
+        id='fieldObject'
+        place='bottom'
+        type='dark'
+        effect='solid'
+      >
+        Objets / Obstacles
+      </ReactTooltip>
+      <ReactTooltip
+        className='menuTooltip'
+        id='sandbag'
+        place='right'
+        type='dark'
+        effect='solid'
+      >
+        Sacs de sables
+      </ReactTooltip>
+      <ReactTooltip
+        className='menuTooltip'
+        id='barbed'
+        place='right'
+        type='dark'
+        effect='solid'
+      >
+        Barbelés
+      </ReactTooltip>
     </Container>
   );
 };
@@ -288,10 +387,13 @@ Toolbar.propTypes = {
   isDownloadEnabled: T.bool.isRequired,
   isCoordsEnabled: T.bool.isRequired,
   onCoordsClick: T.func.isRequired,
+  currentFieldObjectAction: T.number,
+  onActionFieldObjectClick: T.func.isRequired,
 };
 
 Toolbar.defaultProps = {
   currentFieldTypeAction: null,
+  currentFieldObjectAction: null,
 };
 
 export default Toolbar;

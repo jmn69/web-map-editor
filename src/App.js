@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ToastContainer } from 'react-toastify';
 import {
   faCircleNotch,
@@ -13,6 +14,8 @@ import {
   faTimes,
   faUndoAlt,
   faSuperscript,
+  faSuitcase,
+  faWonSign,
 } from '@fortawesome/free-solid-svg-icons';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -22,6 +25,8 @@ import {
   WIDTH,
   COLUMNS,
   ROWS,
+  FieldObjectUnityEnum,
+  FieldTypetUnityEnum,
 } from 'common/constants';
 
 import {
@@ -48,16 +53,30 @@ library.add(
   faPlus,
   faTimes,
   faUndoAlt,
-  faSuperscript
+  faSuperscript,
+  faSuitcase,
+  faWonSign
 );
 
 const initialMap = { cells: [] };
 
-const actionTofieldType = {
-  '1': '0', // Plain
-  '2': '1', // Sand
-  '3': '2', // Water
+// map action enum to unity value
+const actionToUnityValue = {
+  '1': FieldTypetUnityEnum.plain.toString(),
+  '2': FieldTypetUnityEnum.sand.toString(),
+  '3': FieldTypetUnityEnum.water.toString(),
+  '6': FieldObjectUnityEnum.barbed.toString(),
+  '7': FieldObjectUnityEnum.sandbag.toString(),
   null: null, // No action
+};
+
+const unityFieldObjectIcon = {
+  [FieldObjectUnityEnum.barbed]: (
+    <FontAwesomeIcon size='2x' color='#100916' icon='won-sign' />
+  ),
+  [FieldObjectUnityEnum.sandbag]: (
+    <FontAwesomeIcon size='2x' color='#100916' icon='suitcase' />
+  ),
 };
 
 const numberOfCells = COLUMNS * ROWS;
@@ -66,6 +85,9 @@ export default () => {
   const [map, setMap] = useState(initialMap);
   const [selectedCell, setSelectedCell] = useState(null);
   const [currentFieldTypeAction, setCurrentFieldTypeAction] = useState(null);
+  const [currentFieldObjectAction, setCurrentFieldObjectAction] = useState(
+    null
+  );
   const [isShiftHold, setIsShiftHold] = useState(false);
   const [isEraserEnabled, setIsEraserEnabled] = useState(false);
   const [isCoordsEnabled, setIsCoordsEnabled] = useState(false);
@@ -106,6 +128,39 @@ export default () => {
     }
   };
 
+  const handleActionFieldObjectClick = action => {
+    setIsEraserEnabled(false);
+    if (currentFieldObjectAction === action) {
+      setCurrentFieldObjectAction(null);
+    }
+ else {
+      setCurrentFieldObjectAction(action);
+    }
+  };
+
+  const updateMapCell = (column, row, fieldsToUpdate) => {
+    const mapToUpdate = { ...map };
+    const foundCell = mapToUpdate.cells.find(
+      cell => cell.column === column && cell.row === row
+    );
+    const cellToUpdate = {
+      ...foundCell,
+      column,
+      row,
+    };
+    fieldsToUpdate.forEach(({ propName, value }) => {
+      cellToUpdate[propName] = value;
+    });
+
+    if (foundCell) {
+      mapToUpdate.cells = map.cells.filter(
+        cell => cell.column !== column || cell.row !== row
+      );
+    }
+    mapToUpdate.cells.push(cellToUpdate);
+    setMap(mapToUpdate);
+  };
+
   const handleHexaMouseEnter = (column, row) => {
     if (isShiftHold && (isEraserEnabled || currentFieldTypeAction)) {
       const mapToUpdate = { ...map };
@@ -114,7 +169,7 @@ export default () => {
       );
       const cellToUpdate = {
         ...foundCell,
-        fieldType: actionTofieldType[currentFieldTypeAction],
+        fieldType: actionToUnityValue[currentFieldTypeAction],
         column,
         row,
       };
@@ -131,30 +186,33 @@ export default () => {
 
   const handleCellClick = (column, row) => {
     setSelectedCell({ column, row });
-    if (isEraserEnabled || currentFieldTypeAction) {
-      const mapToUpdate = { ...map };
-      const foundCell = mapToUpdate.cells.find(
-        cell => cell.column === column && cell.row === row
-      );
-      const cellToUpdate = {
-        ...foundCell,
-        fieldType: actionTofieldType[currentFieldTypeAction],
-        column,
-        row,
-      };
-
-      if (foundCell) {
-        mapToUpdate.cells = map.cells.filter(
-          cell => cell.column !== column || cell.row !== row
-        );
+    if (isEraserEnabled) {
+      updateMapCell(column, row, [
+        { propName: 'fieldType', value: null },
+        { propName: 'fieldObject', value: null },
+      ]);
+    }
+ else {
+      const fieldsToUpdate = [];
+      if (currentFieldTypeAction) {
+        fieldsToUpdate.push({
+          propName: 'fieldType',
+          value: actionToUnityValue[currentFieldTypeAction],
+        });
       }
-      mapToUpdate.cells.push(cellToUpdate);
-      setMap(mapToUpdate);
+      if (currentFieldObjectAction) {
+        fieldsToUpdate.push({
+          propName: 'fieldObject',
+          value: actionToUnityValue[currentFieldObjectAction],
+        });
+      }
+      updateMapCell(column, row, fieldsToUpdate);
     }
   };
 
   const disableCurrentActions = () => {
     setCurrentFieldTypeAction(null);
+    setCurrentFieldObjectAction(null);
   };
 
   const handleEraserClick = () => {
@@ -205,18 +263,21 @@ export default () => {
           foundCellInMap={foundCellInMap}
         />
       );
-      if (isCoordsEnabled) {
+      if (isCoordsEnabled || (foundCellInMap && foundCellInMap.fieldObject)) {
+        const calcBottom = isCoordsEnabled ? 25 : 23;
         hexes.push(
           <ContentWrapper
             onMouseEnter={() => handleHexaMouseEnter(column, row)}
             onClick={() => handleCellClick(column, row)}
             key={`${column}-${row}-content`}
-            bottom={lastVerticalSpace + 25}
+            bottom={lastVerticalSpace + calcBottom}
             left={
               lastHorizontalSpace + (column % 2 === 0 ? 10 : HORIZONTAL_SPACE)
             }
           >
-            {`${column}-${row}`}
+            {isCoordsEnabled
+              ? `${column}-${row}`
+              : unityFieldObjectIcon[foundCellInMap.fieldObject]}
           </ContentWrapper>
         );
       }
@@ -249,6 +310,8 @@ export default () => {
                 currentFieldTypeAction={currentFieldTypeAction}
                 onCoordsClick={handleCoordsClick}
                 isCoordsEnabled={isCoordsEnabled}
+                currentFieldObjectAction={currentFieldObjectAction}
+                onActionFieldObjectClick={handleActionFieldObjectClick}
               />
             </ToolbarWrapper>
             {hexes}

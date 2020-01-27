@@ -5,6 +5,19 @@ export const ToolbarActionEnum = Object.freeze({
   water: 3,
   download: 4,
   upload: 5,
+  barbed: 6,
+  sandbag: 7,
+});
+
+export const FieldObjectUnityEnum = Object.freeze({
+  barbed: 0,
+  sandbag: 1,
+});
+
+export const FieldTypetUnityEnum = Object.freeze({
+  plain: 0,
+  sand: 1,
+  water: 2,
 });
 
 export const VERTICAL_SPACE = 50;
