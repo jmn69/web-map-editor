@@ -87,7 +87,9 @@ export const HexaTopLeft = styled.div`
   transform: scaleY(0.5774) rotate(-45deg);
 
   &:hover {
-    background: rgba(97, 97, 97, 1);
+    background: ${props =>
+      props.isEnabled ? 'rgba(33, 33, 33, 1)' : 'rgba(97, 97, 97, 1)'};
+    z-index: 40000;
   }
 `;
 
@@ -102,7 +104,9 @@ export const HexaTopRight = styled.div`
   transform: scaleY(0.5774) rotate(45deg);
 
   &:hover {
-    background: rgba(97, 97, 97, 1);
+    background: ${props =>
+      props.isEnabled ? 'rgba(33, 33, 33, 1)' : 'rgba(97, 97, 97, 1)'};
+    z-index: 40000;
   }
 `;
 
@@ -117,7 +121,9 @@ export const HexaBottomRight = styled.div`
   transform: scaleY(0.5774) rotate(-45deg);
 
   &:hover {
-    background: rgba(97, 97, 97, 1);
+    background: ${props =>
+      props.isEnabled ? 'rgba(33, 33, 33, 1)' : 'rgba(97, 97, 97, 1)'};
+    z-index: 40000;
   }
 `;
 
@@ -132,7 +138,9 @@ export const HexaBottomLeft = styled.div`
   transform: scaleY(0.5774) rotate(45deg);
 
   &:hover {
-    background: rgba(97, 97, 97, 1);
+    background: ${props =>
+      props.isEnabled ? 'rgba(33, 33, 33, 1)' : 'rgba(97, 97, 97, 1)'};
+    z-index: 40000;
   }
 `;
 
@@ -146,7 +154,9 @@ export const HexaRight = styled.div`
   right: 0;
 
   &:hover {
-    background: rgba(97, 97, 97, 1);
+    background: ${props =>
+      props.isEnabled ? 'rgba(33, 33, 33, 1)' : 'rgba(97, 97, 97, 1)'};
+    z-index: 40000;
   }
 `;
 
@@ -160,6 +170,8 @@ export const HexaLeft = styled.div`
   left: 0;
 
   &:hover {
-    background: rgba(97, 97, 97, 1);
+    background: ${props =>
+      props.isEnabled ? 'rgba(33, 33, 33, 1)' : 'rgba(97, 97, 97, 1)'};
+    z-index: 40000;
   }
 `;

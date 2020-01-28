@@ -113,6 +113,7 @@ export default () => {
       const key = event.key || event.keyCode;
 
       if (key === 'Escape' || key === 27) {
+        setIsEraserEnabled(false);
         disableCurrentActions();
         setSelectedCell(null);
       }
