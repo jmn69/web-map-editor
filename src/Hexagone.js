@@ -1,5 +1,6 @@
 import React from 'react';
 import T from 'prop-types';
+import get from 'lodash.get';
 
 import { HORIZONTAL_SPACE } from 'common/constants';
 
@@ -25,15 +26,28 @@ const Hexagone = ({
   isSelected,
   onOrientationClick,
 }) => {
-  const updateOrientation = orientationProp => {
-    const updatedFieldObject = { ...foundCellInMap.fieldObject };
-    updatedFieldObject.orientation = {
-      ...updatedFieldObject.orientation,
-      [orientationProp]: !foundCellInMap.fieldObject.orientation[
-        orientationProp
+  const fieldObjectOrientation = get(foundCellInMap, 'fieldObject.orientation');
+  const structureOrientation = get(foundCellInMap, 'structure.orientation');
+  const orientation = fieldObjectOrientation || structureOrientation;
+
+  const updateOrientationObject = (propObjectName, propOrientationName) => {
+    const updatedObject = { ...foundCellInMap[propObjectName] };
+    updatedObject.orientation = {
+      ...updatedObject.orientation,
+      [propOrientationName]: !foundCellInMap[propObjectName].orientation[
+        propOrientationName
       ],
     };
-    onOrientationClick(column, row, updatedFieldObject);
+    onOrientationClick(column, row, updatedObject, propObjectName);
+  };
+
+  const updateOrientation = orientationProp => {
+    if (fieldObjectOrientation) {
+      updateOrientationObject('fieldObject', orientationProp);
+    }
+    if (structureOrientation) {
+      updateOrientationObject('structure', orientationProp);
+    }
   };
 
   const handleCellClick = () => {
@@ -74,10 +88,7 @@ const Hexagone = ({
     updateOrientation('right');
   };
 
-  const orientation =
-    foundCellInMap &&
-    foundCellInMap.fieldObject &&
-    foundCellInMap.fieldObject.orientation;
+  const fieldType = get(foundCellInMap, 'fieldType');
 
   return (
     <Container
@@ -88,10 +99,7 @@ const Hexagone = ({
         lastHorizontalSpace + (column % 2 === 0 ? 10 : HORIZONTAL_SPACE - 1)
       }
     >
-      <HexagoneStyled
-        isSelected={isSelected}
-        fieldType={foundCellInMap && foundCellInMap.fieldType}
-      >
+      <HexagoneStyled isSelected={isSelected} fieldType={fieldType}>
         {orientation ? (
           <HexaTopLeft
             onClick={handleTopLeftClick}

@@ -16,6 +16,8 @@ import {
   faSuperscript,
   faSuitcase,
   faWonSign,
+  faBuilding,
+  faEyeSlash,
 } from '@fortawesome/free-solid-svg-icons';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -27,6 +29,8 @@ import {
   ROWS,
   FieldObjectUnityEnum,
   FieldTypetUnityEnum,
+  FieldStructureUnityEnum,
+  ActionTypeEnum,
 } from 'common/constants';
 
 import {
@@ -55,7 +59,9 @@ library.add(
   faUndoAlt,
   faSuperscript,
   faSuitcase,
-  faWonSign
+  faWonSign,
+  faBuilding,
+  faEyeSlash
 );
 
 const initialMap = { cells: [] };
@@ -67,6 +73,8 @@ const actionToUnityValue = {
   '3': FieldTypetUnityEnum.water.toString(),
   '6': { id: FieldObjectUnityEnum.barbed.toString() },
   '7': { id: FieldObjectUnityEnum.sandbag.toString(), orientation: {} },
+  '8': { id: FieldStructureUnityEnum.building.toString(), orientation: {} },
+  '9': { id: FieldStructureUnityEnum.breakeableView.toString() },
   null: null, // No action
 };
 
@@ -79,6 +87,15 @@ const unityFieldObjectIcon = {
   ),
 };
 
+const unityStructureIcon = {
+  [FieldStructureUnityEnum.building]: (
+    <FontAwesomeIcon size='2x' color='#100916' icon='building' />
+  ),
+  [FieldStructureUnityEnum.breakeableView]: (
+    <FontAwesomeIcon size='2x' color='#100916' icon='eye-slash' />
+  ),
+};
+
 const numberOfCells = COLUMNS * ROWS;
 
 export default () => {
@@ -88,6 +105,7 @@ export default () => {
   const [currentFieldObjectAction, setCurrentFieldObjectAction] = useState(
     null
   );
+  const [currentStructureAction, setCurrentStructureAction] = useState(null);
   const [isShiftHold, setIsShiftHold] = useState(false);
   const [isEraserEnabled, setIsEraserEnabled] = useState(false);
   const [isCoordsEnabled, setIsCoordsEnabled] = useState(false);
@@ -124,29 +142,47 @@ export default () => {
     });
   }, []);
 
-  const handleOrientationClick = (column, row, updatedFieldObject) => {
+  const handleOrientationClick = (
+    column,
+    row,
+    updatedObject,
+    propObjectName
+  ) => {
     updateMapCell(column, row, [
-      { propName: 'fieldObject', value: updatedFieldObject },
+      { propName: propObjectName, value: updatedObject },
     ]);
   };
 
-  const handleFieldTypeActionClick = action => {
+  const handleActionClick = (action, actionType) => {
     setIsEraserEnabled(false);
-    if (currentFieldTypeAction === action) {
-      setCurrentFieldTypeAction(null);
-    }
+    switch (actionType) {
+      case ActionTypeEnum.fieldType:
+        if (currentFieldTypeAction === action) {
+          setCurrentFieldTypeAction(null);
+        }
  else {
-      setCurrentFieldTypeAction(action);
-    }
-  };
-
-  const handleActionFieldObjectClick = action => {
-    setIsEraserEnabled(false);
-    if (currentFieldObjectAction === action) {
-      setCurrentFieldObjectAction(null);
-    }
+          setCurrentFieldTypeAction(action);
+        }
+        break;
+      case ActionTypeEnum.fieldObject:
+        setCurrentStructureAction(null);
+        if (currentFieldObjectAction === action) {
+          setCurrentFieldObjectAction(null);
+        }
  else {
-      setCurrentFieldObjectAction(action);
+          setCurrentFieldObjectAction(action);
+        }
+        break;
+      case ActionTypeEnum.structure:
+        setCurrentFieldObjectAction(null);
+        if (currentStructureAction === action) {
+          setCurrentStructureAction(null);
+        }
+ else {
+          setCurrentStructureAction(action);
+        }
+        break;
+      default:
     }
   };
 
@@ -173,41 +209,12 @@ export default () => {
     setMap(mapToUpdate);
   };
 
-  const handleHexaMouseEnter = (column, row) => {
-    if (isShiftHold) {
-      if (isEraserEnabled) {
-        updateMapCell(column, row, [
-          { propName: 'fieldType', value: null },
-          { propName: 'fieldObject', value: null },
-        ]);
-      }
- else {
-        const fieldsToUpdate = [];
-        if (currentFieldTypeAction) {
-          fieldsToUpdate.push({
-            propName: 'fieldType',
-            value: actionToUnityValue[currentFieldTypeAction],
-          });
-        }
-        if (currentFieldObjectAction) {
-          fieldsToUpdate.push({
-            propName: 'fieldObject',
-            value: actionToUnityValue[currentFieldObjectAction],
-          });
-        }
-        if (fieldsToUpdate.length > 0) {
-          updateMapCell(column, row, fieldsToUpdate);
-        }
-      }
-    }
-  };
-
-  const handleCellClick = (column, row) => {
-    setSelectedCell({ column, row });
+  const prepareFieldsAndUpdateMap = (column, row) => {
     if (isEraserEnabled) {
       updateMapCell(column, row, [
         { propName: 'fieldType', value: null },
         { propName: 'fieldObject', value: null },
+        { propName: 'structure', value: null },
       ]);
     }
  else {
@@ -224,15 +231,33 @@ export default () => {
           value: actionToUnityValue[currentFieldObjectAction],
         });
       }
+      if (currentStructureAction) {
+        fieldsToUpdate.push({
+          propName: 'structure',
+          value: actionToUnityValue[currentStructureAction],
+        });
+      }
       if (fieldsToUpdate.length > 0) {
         updateMapCell(column, row, fieldsToUpdate);
       }
     }
   };
 
+  const handleHexaMouseEnter = (column, row) => {
+    if (isShiftHold) {
+      prepareFieldsAndUpdateMap(column, row);
+    }
+  };
+
+  const handleCellClick = (column, row) => {
+    setSelectedCell({ column, row });
+    prepareFieldsAndUpdateMap(column, row);
+  };
+
   const disableCurrentActions = () => {
     setCurrentFieldTypeAction(null);
     setCurrentFieldObjectAction(null);
+    setCurrentStructureAction(null);
   };
 
   const handleEraserClick = () => {
@@ -262,6 +287,21 @@ export default () => {
     setMap(map);
   };
 
+  const renderHexaContent = (column, row, foundCellInMap) => {
+    if (isCoordsEnabled) {
+      return `${column}-${row}`;
+    }
+
+    const { fieldObject, structure } = foundCellInMap;
+    if (fieldObject) {
+      return unityFieldObjectIcon[fieldObject.id];
+    }
+
+    if (structure) {
+      return unityStructureIcon[structure.id];
+    }
+  };
+
   const hexes = [];
 
   let lastHorizontalSpace = 0;
@@ -289,7 +329,11 @@ export default () => {
           }
         />
       );
-      if (isCoordsEnabled || (foundCellInMap && foundCellInMap.fieldObject)) {
+      if (
+        isCoordsEnabled ||
+        (foundCellInMap && foundCellInMap.fieldObject) ||
+        (foundCellInMap && foundCellInMap.structure)
+      ) {
         const calcBottom = isCoordsEnabled ? 25 : 22;
         hexes.push(
           <ContentWrapper
@@ -302,9 +346,7 @@ export default () => {
               (column % 2 === 0 ? 10 : HORIZONTAL_SPACE - 1)
             }
           >
-            {isCoordsEnabled
-              ? `${column}-${row}`
-              : unityFieldObjectIcon[foundCellInMap.fieldObject.id]}
+            {renderHexaContent(column, row, foundCellInMap)}
           </ContentWrapper>
         );
       }
@@ -333,12 +375,12 @@ export default () => {
                 onDownloadClick={handleDownloadClick}
                 onUploadClick={handleUploadClick}
                 isDownloadEnabled={numberOfCells === map.cells.length}
-                onActionFieldTypeClick={handleFieldTypeActionClick}
+                onActionClick={handleActionClick}
                 currentFieldTypeAction={currentFieldTypeAction}
                 onCoordsClick={handleCoordsClick}
                 isCoordsEnabled={isCoordsEnabled}
                 currentFieldObjectAction={currentFieldObjectAction}
-                onActionFieldObjectClick={handleActionFieldObjectClick}
+                currentStructureAction={currentStructureAction}
               />
             </ToolbarWrapper>
             {hexes}

@@ -7,6 +7,13 @@ export const ToolbarActionEnum = Object.freeze({
   upload: 5,
   barbed: 6,
   sandbag: 7,
+  building: 8,
+  breakableView: 9,
+});
+
+export const FieldStructureUnityEnum = Object.freeze({
+  building: 0,
+  breakeableView: 1,
 });
 
 export const FieldObjectUnityEnum = Object.freeze({
@@ -18,6 +25,12 @@ export const FieldTypetUnityEnum = Object.freeze({
   plain: 0,
   sand: 1,
   water: 2,
+});
+
+export const ActionTypeEnum = Object.freeze({
+  fieldType: 0,
+  fieldObject: 1,
+  structure: 2,
 });
 
 export const VERTICAL_SPACE = 51;

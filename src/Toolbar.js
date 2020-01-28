@@ -10,7 +10,7 @@ import {
 } from 'react-floating-button-menu';
 
 import Circle from 'common/components/Circle';
-import { ToolbarActionEnum } from 'common/constants';
+import { ToolbarActionEnum, ActionTypeEnum } from 'common/constants';
 
 import {
   Container,
@@ -35,11 +35,17 @@ const actionIcons = {
   [ToolbarActionEnum.barbed]: (
     <FontAwesomeIcon size='2x' color='#100916' icon='won-sign' />
   ),
+  [ToolbarActionEnum.building]: (
+    <FontAwesomeIcon size='2x' color='#100916' icon='building' />
+  ),
+  [ToolbarActionEnum.breakableView]: (
+    <FontAwesomeIcon size='2x' color='#100916' icon='eye-slash' />
+  ),
   null: <FontAwesomeIcon size='2x' color='#ff5613' icon='plus' />,
 };
 
 const Toolbar = ({
-  onActionFieldTypeClick,
+  onActionClick,
   currentFieldTypeAction,
   onDownloadClick,
   isDownloadEnabled,
@@ -49,10 +55,11 @@ const Toolbar = ({
   isCoordsEnabled,
   onCoordsClick,
   currentFieldObjectAction,
-  onActionFieldObjectClick,
+  currentStructureAction,
 }) => {
   const [isFieldTypeOpen, setFieldTypeIsOpen] = useState(false);
   const [isFieldObjectOpen, setFieldObjectIsOpen] = useState(false);
+  const [isStructureOpen, setIsStructureOpen] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
 
   useEffect(() => {
@@ -77,28 +84,38 @@ const Toolbar = ({
   };
 
   const handleWaterClick = () => {
-    onActionFieldTypeClick(ToolbarActionEnum.water);
+    onActionClick(ToolbarActionEnum.water, ActionTypeEnum.fieldType);
     setFieldTypeIsOpen(false);
   };
 
   const handleSandClick = () => {
-    onActionFieldTypeClick(ToolbarActionEnum.sand);
+    onActionClick(ToolbarActionEnum.sand, ActionTypeEnum.fieldType);
     setFieldTypeIsOpen(false);
   };
 
   const handlePlainClick = () => {
-    onActionFieldTypeClick(ToolbarActionEnum.plain);
+    onActionClick(ToolbarActionEnum.plain, ActionTypeEnum.fieldType);
     setFieldTypeIsOpen(false);
   };
 
   const handleBarbedClick = () => {
-    onActionFieldObjectClick(ToolbarActionEnum.barbed);
+    onActionClick(ToolbarActionEnum.barbed, ActionTypeEnum.fieldObject);
     setFieldObjectIsOpen(false);
   };
 
   const handleSandbagClick = () => {
-    onActionFieldObjectClick(ToolbarActionEnum.sandbag);
+    onActionClick(ToolbarActionEnum.sandbag, ActionTypeEnum.fieldObject);
     setFieldObjectIsOpen(false);
+  };
+
+  const handleBuildingClick = () => {
+    onActionClick(ToolbarActionEnum.building, ActionTypeEnum.structure);
+    setIsStructureOpen(false);
+  };
+
+  const handleBreakableViewClick = () => {
+    onActionClick(ToolbarActionEnum.breakableView, ActionTypeEnum.structure);
+    setIsStructureOpen(false);
   };
 
   return (
@@ -252,6 +269,60 @@ const Toolbar = ({
             />
           </FloatingMenu>
         </FloatingMenuContainer>
+        <FloatingMenuContainer>
+          <FloatingMenu
+            slideSpeed={500}
+            direction='down'
+            spacing={8}
+            isOpen={isStructureOpen}
+            style={{ position: 'absolute', top: 0 }}
+          >
+            <MainButton
+              data-tip
+              data-for='structure'
+              background='white'
+              iconResting={actionIcons[currentStructureAction]}
+              iconActive={
+                <FontAwesomeIcon size='2x' color='gray' icon='times' />
+              }
+              onClick={() => {
+                setIsStructureOpen(!isStructureOpen);
+                if (!isStructureOpen) {
+                  setIsHidden(false);
+                }
+              }}
+              size={60}
+            />
+            <ChildButton
+              data-tip
+              data-for='breakableView'
+              icon={
+                currentStructureAction === ToolbarActionEnum.breakableView ? (
+                  <FontAwesomeIcon size='2x' color='gray' icon='undo-alt' />
+                ) : (
+                  <FontAwesomeIcon size='2x' color='#100916' icon='eye-slash' />
+                )
+              }
+              background='white'
+              size={45}
+              onClick={handleBreakableViewClick}
+            />
+            <ChildButton
+              data-tip
+              data-for='building'
+              icon={
+                currentStructureAction === ToolbarActionEnum.building ? (
+                  <FontAwesomeIcon size='2x' color='gray' icon='undo-alt' />
+                ) : (
+                  <FontAwesomeIcon size='2x' color='#100916' icon='building' />
+                )
+              }
+              background='white'
+              size={45}
+              onClick={handleBuildingClick}
+            />
+          </FloatingMenu>
+        </FloatingMenuContainer>
       </ButtonContainer>
       <ButtonContainer>
         <CircleWrapper>
@@ -395,6 +466,33 @@ const Toolbar = ({
       >
         Barbelés
       </ReactTooltip>
+      <ReactTooltip
+        className='menuTooltip'
+        id='breakableView'
+        place='right'
+        type='dark'
+        effect='solid'
+      >
+        Brise vue
+      </ReactTooltip>
+      <ReactTooltip
+        className='menuTooltip'
+        id='building'
+        place='right'
+        type='dark'
+        effect='solid'
+      >
+        Batiment
+      </ReactTooltip>
+      <ReactTooltip
+        className='menuTooltip'
+        id='structure'
+        place='bottom'
+        type='dark'
+        effect='solid'
+      >
+        Structures
+      </ReactTooltip>
     </Container>
   );
 };
@@ -402,19 +500,20 @@ const Toolbar = ({
 Toolbar.propTypes = {
   onEraserClick: T.func.isRequired,
   isEraserEnabled: T.bool.isRequired,
-  onActionFieldTypeClick: T.func.isRequired,
+  onActionClick: T.func.isRequired,
   currentFieldTypeAction: T.number,
   onDownloadClick: T.func.isRequired,
   isDownloadEnabled: T.bool.isRequired,
   isCoordsEnabled: T.bool.isRequired,
   onCoordsClick: T.func.isRequired,
   currentFieldObjectAction: T.number,
-  onActionFieldObjectClick: T.func.isRequired,
+  currentStructureAction: T.number,
 };
 
 Toolbar.defaultProps = {
   currentFieldTypeAction: null,
   currentFieldObjectAction: null,
+  currentStructureAction: null,
 };
 
 export default Toolbar;
