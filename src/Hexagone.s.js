@@ -75,3 +75,91 @@ export const HexagoneStyled = styled.div`
     border-left: solid 1.4142px ${props => props.theme.colors.black};
   }
 `;
+
+export const HexaTopLeft = styled.div`
+  height: 11.3134px;
+  width: 43px;
+  z-index: 30000;
+  background: ${props => (props.isEnabled ? '#616161' : 'none')};
+  position: absolute;
+  top: -11px;
+  left: -3px;
+  transform: scaleY(0.5774) rotate(-45deg);
+
+  &:hover {
+    background: rgba(97, 97, 97, 1);
+  }
+`;
+
+export const HexaTopRight = styled.div`
+  height: 11.3134px;
+  width: 43px;
+  z-index: 30000;
+  background: ${props => (props.isEnabled ? '#616161' : 'none')};
+  position: absolute;
+  top: -11px;
+  right: -3px;
+  transform: scaleY(0.5774) rotate(45deg);
+
+  &:hover {
+    background: rgba(97, 97, 97, 1);
+  }
+`;
+
+export const HexaBottomRight = styled.div`
+  height: 11.3134px;
+  width: 43px;
+  z-index: 30000;
+  background: ${props => (props.isEnabled ? '#616161' : 'none')};
+  position: absolute;
+  bottom: -11.5px;
+  right: -3px;
+  transform: scaleY(0.5774) rotate(-45deg);
+
+  &:hover {
+    background: rgba(97, 97, 97, 1);
+  }
+`;
+
+export const HexaBottomLeft = styled.div`
+  height: 11.3134px;
+  width: 43px;
+  z-index: 30000;
+  background: ${props => (props.isEnabled ? '#616161' : 'none')};
+  position: absolute;
+  bottom: -11.5px;
+  left: -3px;
+  transform: scaleY(0.5774) rotate(45deg);
+
+  &:hover {
+    background: rgba(97, 97, 97, 1);
+  }
+`;
+
+export const HexaRight = styled.div`
+  height: 35px;
+  width: 8px;
+  z-index: 30000;
+  background: ${props => (props.isEnabled ? '#616161' : 'none')};
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  &:hover {
+    background: rgba(97, 97, 97, 1);
+  }
+`;
+
+export const HexaLeft = styled.div`
+  height: 35px;
+  width: 8px;
+  z-index: 30000;
+  background: ${props => (props.isEnabled ? '#616161' : 'none')};
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  &:hover {
+    background: rgba(97, 97, 97, 1);
+  }
+`;

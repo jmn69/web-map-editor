@@ -65,8 +65,8 @@ const actionToUnityValue = {
   '1': FieldTypetUnityEnum.plain.toString(),
   '2': FieldTypetUnityEnum.sand.toString(),
   '3': FieldTypetUnityEnum.water.toString(),
-  '6': FieldObjectUnityEnum.barbed.toString(),
-  '7': FieldObjectUnityEnum.sandbag.toString(),
+  '6': { id: FieldObjectUnityEnum.barbed.toString() },
+  '7': { id: FieldObjectUnityEnum.sandbag.toString(), orientation: {} },
   null: null, // No action
 };
 
@@ -112,11 +112,22 @@ export default () => {
 
       const key = event.key || event.keyCode;
 
+      if (key === 'Escape' || key === 27) {
+        disableCurrentActions();
+        setSelectedCell(null);
+      }
+
       if (key === 'Shift' || key === 16) {
         setIsShiftHold(true);
       }
     });
   }, []);
+
+  const handleOrientationClick = (column, row, updatedFieldObject) => {
+    updateMapCell(column, row, [
+      { propName: 'fieldObject', value: updatedFieldObject },
+    ]);
+  };
 
   const handleFieldTypeActionClick = action => {
     setIsEraserEnabled(false);
@@ -183,7 +194,9 @@ export default () => {
             value: actionToUnityValue[currentFieldObjectAction],
           });
         }
-        updateMapCell(column, row, fieldsToUpdate);
+        if (fieldsToUpdate.length > 0) {
+          updateMapCell(column, row, fieldsToUpdate);
+        }
       }
     }
   };
@@ -210,7 +223,9 @@ export default () => {
           value: actionToUnityValue[currentFieldObjectAction],
         });
       }
-      updateMapCell(column, row, fieldsToUpdate);
+      if (fieldsToUpdate.length > 0) {
+        updateMapCell(column, row, fieldsToUpdate);
+      }
     }
   };
 
@@ -265,6 +280,7 @@ export default () => {
           lastVerticalSpace={lastVerticalSpace}
           lastHorizontalSpace={lastHorizontalSpace}
           foundCellInMap={foundCellInMap}
+          onOrientationClick={handleOrientationClick}
           isSelected={
             selectedCell &&
             selectedCell.column === column &&
@@ -273,7 +289,7 @@ export default () => {
         />
       );
       if (isCoordsEnabled || (foundCellInMap && foundCellInMap.fieldObject)) {
-        const calcBottom = isCoordsEnabled ? 25 : 23;
+        const calcBottom = isCoordsEnabled ? 25 : 22;
         hexes.push(
           <ContentWrapper
             onMouseEnter={() => handleHexaMouseEnter(column, row)}
@@ -281,12 +297,13 @@ export default () => {
             key={`${column}-${row}-content`}
             bottom={lastVerticalSpace + calcBottom}
             left={
-              lastHorizontalSpace + (column % 2 === 0 ? 10 : HORIZONTAL_SPACE)
+              lastHorizontalSpace +
+              (column % 2 === 0 ? 10 : HORIZONTAL_SPACE - 1)
             }
           >
             {isCoordsEnabled
               ? `${column}-${row}`
-              : unityFieldObjectIcon[foundCellInMap.fieldObject]}
+              : unityFieldObjectIcon[foundCellInMap.fieldObject.id]}
           </ContentWrapper>
         );
       }

@@ -215,7 +215,7 @@ const Toolbar = ({
                 <FontAwesomeIcon size='2x' color='gray' icon='times' />
               }
               onClick={() => {
-                setFieldObjectIsOpen(!isFieldTypeOpen);
+                setFieldObjectIsOpen(!isFieldObjectOpen);
                 if (!isFieldObjectOpen) {
                   setIsHidden(false);
                 }

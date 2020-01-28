@@ -20,8 +20,8 @@ export const FieldTypetUnityEnum = Object.freeze({
   water: 2,
 });
 
-export const VERTICAL_SPACE = 50;
-export const HORIZONTAL_SPACE = 40;
+export const VERTICAL_SPACE = 51;
+export const HORIZONTAL_SPACE = 41;
 export const WIDTH = 60;
 export const COLUMNS = 21;
 export const ROWS = 17;
