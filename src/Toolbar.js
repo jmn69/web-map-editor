@@ -167,6 +167,8 @@ const Toolbar = ({
               }
               onClick={() => {
                 setFieldTypeIsOpen(!isFieldTypeOpen);
+                setFieldObjectIsOpen(false);
+                setIsStructureOpen(false);
                 if (!isFieldObjectOpen) {
                   setIsHidden(false);
                 }
@@ -239,6 +241,8 @@ const Toolbar = ({
               }
               onClick={() => {
                 setFieldObjectIsOpen(!isFieldObjectOpen);
+                setFieldTypeIsOpen(false);
+                setIsStructureOpen(false);
                 if (!isFieldObjectOpen) {
                   setIsHidden(false);
                 }
@@ -293,6 +297,8 @@ const Toolbar = ({
               }
               onClick={() => {
                 setIsStructureOpen(!isStructureOpen);
+                setFieldObjectIsOpen(false);
+                setFieldTypeIsOpen(false);
                 if (!isStructureOpen) {
                   setIsHidden(false);
                 }
