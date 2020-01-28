@@ -64,13 +64,19 @@ const Toolbar = ({
 
   useEffect(() => {
     let timer;
-    if (!isFieldTypeOpen && !isFieldObjectOpen) {
+    if (!isFieldTypeOpen && !isFieldObjectOpen && !isStructureOpen) {
       timer = setTimeout(() => {
         setIsHidden(true);
       }, 300);
     }
     return () => clearTimeout(timer);
-  }, [isFieldObjectOpen, isFieldTypeOpen]);
+  }, [isFieldObjectOpen, isFieldTypeOpen, isStructureOpen]);
+
+  useEffect(() => {
+    if (!isFieldObjectOpen && !isStructureOpen) {
+      setIsHidden(false);
+    }
+  }, [isFieldObjectOpen, isStructureOpen]);
 
   const handleDownloadClick = () => {
     if (isDownloadEnabled) {
